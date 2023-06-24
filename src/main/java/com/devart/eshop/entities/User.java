@@ -9,9 +9,9 @@ import lombok.Data;
 @Data
 public class User {
 
-    public User(long id, String username, String password) {
+    public User(String username, String password) {
         super();
-        this.id = id;
+
         this.username = username;
         this.password = password;
     }
