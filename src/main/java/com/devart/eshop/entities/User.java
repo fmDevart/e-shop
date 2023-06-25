@@ -1,14 +1,16 @@
 package com.devart.eshop.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
-@Entity(name="users ")
+@Entity(name = "users")
 @Data
 public class User {
 
+
+    public User(){
+        this.cart = new Cart();
+    }
     public User(String username, String password) {
         super();
 
@@ -18,10 +20,14 @@ public class User {
 
     @Id
     @GeneratedValue
-    long id;
+    Long id;
 
     String username;
     String password;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_id")
+    Cart cart ;
 
 
 }
