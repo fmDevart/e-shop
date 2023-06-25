@@ -8,6 +8,7 @@ import com.devart.eshop.repositories.UserRepository;
 import com.devart.eshop.services.ItemService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +35,7 @@ public class CartController {
         Item item = itemService.getItemById(itemId);
         Cart cart;
         if (Objects.isNull(user.getCart())) {
-            cart  = new Cart();
+            cart = new Cart();
             Set<Item> newSet = new HashSet<>();
             newSet.add(item);
             cart.setItems(newSet);
@@ -60,6 +61,27 @@ public class CartController {
         } else {
             return ResponseEntity.ok(new HashSet<Item>());
         }
+
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Cart> getCartByUserId(@PathVariable long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("user not found"));
+
+        Cart target = user.getCart();
+        if (Objects.nonNull(target))
+            return ResponseEntity.ok(target);
+        return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @DeleteMapping("/{cartId}/item/{itemId}")
+    public ResponseEntity<Cart> removeItemFromCart( @PathVariable long cartId, @PathVariable long itemId){
+
+         Cart target =  cartRepository.findById(cartId).orElseThrow(()-> new EntityNotFoundException("cart not found"));
+         Item targetItem = itemService.getItemById(itemId);
+         target.getItems().remove(targetItem);
+         return ResponseEntity.ok(cartRepository.save(target));
+
 
     }
 

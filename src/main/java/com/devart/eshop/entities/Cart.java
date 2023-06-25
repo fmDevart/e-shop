@@ -16,16 +16,6 @@ public class Cart {
     @GeneratedValue
     Long id;
 
-
-
-
-
-//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    @JoinColumn(name = "cart_id", referencedColumnName = "id")
-//    @JsonIgnore
-//    Set<Item> items = new HashSet<>();
-
-
     @ManyToMany( cascade = CascadeType.ALL)
     @JoinTable(
             name="cart_items",
