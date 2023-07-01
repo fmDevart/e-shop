@@ -3,12 +3,17 @@ package com.devart.eshop.controllers;
 
 import com.devart.eshop.dto.ItemCreateUpdateDto;
 import com.devart.eshop.entities.Item;
+import com.devart.eshop.model.ItemModel;
+import com.devart.eshop.model.ItemModelAssembler;
 import com.devart.eshop.repositories.ItemRepository;
 import com.devart.eshop.services.ItemService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,11 +45,15 @@ public class ItemController {
         return new ResponseEntity<>(itemService.createItem(newItem), HttpStatus.OK);
     }
 
+    @Autowired private ItemModelAssembler itemModelAssembler;
+    @Autowired private PagedResourcesAssembler<Item> pagedResourcesAssembler;
+
     @GetMapping("/all/pag")
-    public Page<Item>getPagedItems( @RequestParam Integer limit,  @RequestParam Integer page ){
+    public PagedModel<ItemModel> getPagedItems(@RequestParam Integer limit, @RequestParam Integer page ){
 
-        return  itemRepository.findAll(PageRequest.of(page,limit, Sort.by(Sort.Order.desc("name"))))  ;
+        Page<Item> pageResponse =   itemRepository.findAll(PageRequest.of(page,limit, Sort.by(Sort.Order.desc("name"))))  ;
 
+        return pagedResourcesAssembler.toModel(pageResponse,itemModelAssembler);
     }
 
 }
