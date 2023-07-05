@@ -15,7 +15,7 @@ public class EShopCommandLineRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         System.out.println("*** save admin user ****");
         if( userRepository.findAll().isEmpty()){
-            userRepository.save( new User("Admin","Admin"));
+            userRepository.save( new User("Admin","Admin","admin@admin.com"));
 
         }
     }

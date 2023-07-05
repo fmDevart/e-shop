@@ -16,19 +16,26 @@ public class Cart {
     @GeneratedValue
     Long id;
 
-    @ManyToMany( cascade = CascadeType.ALL)
-    @JoinTable(
-            name="cart_items",
-            joinColumns = @JoinColumn(
-                    name="cart_id"
-            ),
-            inverseJoinColumns = @JoinColumn(
-                    name="item_id"
-            )
-    )
+    @ManyToMany(cascade = CascadeType.ALL)
+//    @JoinTable(
+//            name="cart_items",
+//            joinColumns = @JoinColumn(
+//                    name="cart_id"
+//            ),
+//            inverseJoinColumns = @JoinColumn(
+//                    name="item_id"
+//            )
+//    )
+
+    @JoinColumn(name="product_id")
     Set<Item> items = new HashSet<>();
 
-    public Cart(){
+
+    @OneToOne(mappedBy = "cart")
+    User user;
+
+
+    public Cart() {
         this.items = new HashSet<>();
     }
 }

@@ -1,13 +1,14 @@
 package com.devart.eshop.controllers;
 
-import com.devart.eshop.dto.LoginDto;
-import com.devart.eshop.dto.UserCreateUpdateDto;
+import com.devart.eshop.dto.AuthenticationRequest;
+import com.devart.eshop.dto.AuthenticationResponse;
+import com.devart.eshop.dto.RegisterRequest;
 import com.devart.eshop.entities.User;
 import com.devart.eshop.repositories.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.devart.eshop.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,8 +19,10 @@ import java.util.List;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @GetMapping("/getAll")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<User> getAllUsers() {
         System.out.println("ricevuto");
 
@@ -27,35 +30,32 @@ public class UserController {
 
     }
 
-    @PostMapping("/addUser")
-    public ResponseEntity<User> createUser(@RequestBody UserCreateUpdateDto newUser) {
+    // @PostMapping("/addUser")
+    // public ResponseEntity<User> createUser(@RequestBody UserCreateUpdateDto newUser) {
 
-        User user = new User(newUser.getUsername(), newUser.getPassword());
+    //     User user = new User(newUser.getUsername(), newUser.getPassword());
 
-        userRepository.save(user);
-        return ResponseEntity.ok(user);
+    //     userRepository.save(user);
+    //     return ResponseEntity.ok(user);
 
-    }
+    // }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginData) {
-        try {
-            User userTarget = userRepository.findByUsername(loginData.getUsername()).orElseThrow(() -> new EntityNotFoundException());
-            if(!userTarget.getPassword().equals(loginData.getPassword())){
-                throw new Exception("wrong credential!");
-            }
-            return new ResponseEntity<String>("login success", HttpStatus.OK);
+    @PostMapping("/auth/login")
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
 
-        } catch (EntityNotFoundException e ) {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-        }
-        catch (Exception e ){
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.FORBIDDEN);
 
-        }
+        return ResponseEntity.ok(userService.authenticateUser(request));
 
 
     }
+
+
+    @PostMapping("/auth/register")
+    public ResponseEntity<AuthenticationResponse> register( @RequestBody RegisterRequest request){
+
+        return ResponseEntity.ok(userService.registerUser(request));
+    }
+
 
 }
 
